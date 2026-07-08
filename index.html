@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haplictics — World Happiness Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F1E9;--surface:#EFE9DF;--ink:#2C2416;--ink2:#4A3F30;--ink3:#8C7E6A;
+  --sage:#5E8C61;--sage-light:#D6EBD6;--sage-mid:#8FBF8F;
+  --gold:#D4A017;--gold-light:#FDF3CC;
+  --rose:#D4706A;--rose-light:#FDE8E6;
+  --sky:#7FA7C9;--sky-light:#DCF0F5;
+  --lavender:#B7A7D9;--peach:#F2D27A;--peach-light:#FDF3D6;
+  --teal:#4F6D8A;--border:#D9D0C0;
+  --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:32px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--sage-mid);border-radius:99px}
+
+.main-section{display:block}
+.test-page{display:none;min-height:100vh;align-items:center;justify-content:center;padding:80px 20px;
+  background:
+    radial-gradient(ellipse 700px 600px at 15% 20%,rgba(94,140,97,0.35) 0%,transparent 55%),
+    radial-gradient(ellipse 600px 500px at 85% 75%,rgba(127,167,201,0.35) 0%,transparent 55%),
+    radial-gradient(ellipse 400px 350px at 75% 15%,rgba(183,167,217,0.28) 0%,transparent 50%),
+    radial-gradient(ellipse 350px 300px at 10% 80%,rgba(242,210,122,0.25) 0%,transparent 50%),
+    #DDD8CE;
+}
+.test-page.active{display:flex}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:200;background:rgba(246,241,233,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 56px;height:66px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;border:none;background:transparent}
+.logo-mark{width:56px;height:56px;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:center;}
+.logo-mark img{width:100%;height:100%;object-fit:contain}
+.logo-text{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--ink);letter-spacing:-0.02em}
+nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+
+.hamburger{display:none;border:none;background:transparent;color:var(--ink);cursor:pointer;padding:8px;border-radius:8px}
+.hamburger:hover{background:var(--surface)}
+
+@media(max-width:900px){
+  .hamburger{display:flex;align-items:center}
+  nav{
+    display:none;
+    position:fixed;
+    top:66px;left:0;right:0;
+    background:var(--bg);
+    border-bottom:1px solid var(--border);
+    flex-direction:column;
+    align-items:stretch;
+    padding:12px 20px;
+    gap:8px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.08);
+    z-index:199;
+  }
+  nav.open{display:flex}
+  nav .nav-btn,nav .nav-cta,nav .nav-cta-post{width:100%;text-align:center;padding:12px}
+  header{height:66px;flex-wrap:nowrap;padding:0 20px}
+}
+
+.nav-btn{padding:6px 13px;border-radius:99px;font-size:0.78rem;font-weight:500;color:var(--ink2);cursor:pointer;border:none;background:transparent;transition:all 0.18s;font-family:'DM Sans',sans-serif}
+.nav-btn:hover,.nav-btn.active{background:var(--ink);color:#fff}
+.nav-cta{margin-left:4px;padding:7px 16px;border-radius:99px;background:var(--sage);color:#fff;font-size:0.78rem;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.nav-cta:hover{background:var(--ink)}
+.nav-cta-post{margin-left:4px;padding:7px 16px;border-radius:99px;background:var(--rose);color:#fff;font-size:0.78rem;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.nav-cta-post:hover{background:var(--ink)}
+
+/* ══ JOURNEY STEPPER ══ */
+.journey-bar{
+  position:sticky;top:66px;z-index:150;
+  background:rgba(246,241,233,0.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:12px 56px;
+  display:flex;align-items:center;justify-content:center;
+  gap:0;
+}
+.journey-track{
+  display:flex;align-items:center;
+  background:rgba(255,255,255,0.55);
+  border:1px solid var(--border);
+  border-radius:99px;
+  padding:5px;
+  gap:0;
+  box-shadow:0 2px 10px rgba(44,36,22,0.06);
+}
+.journey-step{
+  display:flex;align-items:center;gap:8px;
+  font-size:0.75rem;font-weight:600;
+  color:var(--ink3);
+  padding:7px 18px;border-radius:99px;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;cursor:default;position:relative;letter-spacing:0.01em;
+}
+.journey-step.active{background:var(--ink);color:#fff;box-shadow:0 4px 16px rgba(44,36,22,0.22);transform:scale(1.03);}
+.journey-step.done{background:var(--sage-light);color:var(--sage);border:1px solid var(--sage-mid);}
+.journey-step.locked{opacity:0.4;}
+.step-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:rgba(0,0,0,0.08);flex-shrink:0;transition:all 0.3s;}
+.journey-step.done .step-icon{background:var(--sage);color:#fff;font-size:0.68rem;}
+.journey-step.active .step-icon{background:rgba(255,255,255,0.22);color:#fff;}
+.journey-connector{display:flex;align-items:center;gap:3px;padding:0 6px;flex-shrink:0;}
+.jdot{width:4px;height:4px;border-radius:50%;background:var(--border);transition:background 0.4s;}
+.journey-connector.done .jdot{background:var(--sage-mid);}
+
+@media(max-width:900px){
+  .journey-bar{padding:10px 16px;}
+  .journey-track{padding:4px;}
+  .journey-step{padding:6px 12px;font-size:0.7rem;gap:6px}
+  .step-label{display:none}
+  .step-label-short{display:inline}
+  .journey-connector{padding:0 3px;gap:2px;}
+  .jdot{width:3px;height:3px;}
+}
+@media(min-width:901px){.step-label-short{display:none}}
+
+/* ── HERO ── */
+.section-anchor{scroll-margin-top:110px}
+.hero{position:relative;min-height:calc(100vh - 66px);display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center;}
+.hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 700px 600px at 20% 30%,rgba(94,140,97,0.55) 0%,transparent 60%),radial-gradient(ellipse 600px 500px at 80% 70%,rgba(127,167,201,0.45) 0%,transparent 60%),radial-gradient(ellipse 500px 400px at 50% 10%,rgba(183,167,217,0.40) 0%,transparent 55%),radial-gradient(ellipse 400px 350px at 90% 10%,rgba(242,210,122,0.40) 0%,transparent 55%),radial-gradient(ellipse 400px 300px at 5% 85%,rgba(212,112,106,0.30) 0%,transparent 55%),#EDE8DC;}
+.blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.55;animation:drift 12s ease-in-out infinite alternate}
+.blob1{width:380px;height:380px;background:var(--sage-mid);top:-80px;left:-100px;animation-duration:14s}
+.blob2{width:300px;height:300px;background:var(--sky);bottom:-60px;right:-80px;animation-duration:10s;animation-delay:-4s}
+.blob3{width:240px;height:240px;background:var(--lavender);top:30%;right:15%;animation-duration:11s;animation-delay:-2s}
+.blob4{width:200px;height:200px;background:var(--peach);bottom:15%;left:10%;animation-duration:13s;animation-delay:-6s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(0.97)}100%{transform:translate(20px,10px) scale(1.03)}}
+.hero-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:80px 40px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.6);backdrop-filter:blur(8px);padding:6px 18px;border-radius:99px;font-size:0.78rem;font-weight:600;color:var(--ink2);margin-bottom:32px;letter-spacing:0.05em;}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--sage);animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.hero-title{font-family:'DM Serif Display',serif;font-size:clamp(3.2rem,6vw,5.4rem);line-height:1.04;letter-spacing:-0.03em;color:var(--ink);margin-bottom:36px;text-shadow:0 2px 40px rgba(255,255,255,0.6);}
+.hero-title em{font-style:italic;color:var(--sage)}
+.hero-cta-btn{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;border-radius:99px;background:var(--ink);color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:500;cursor:pointer;border:none;transition:all 0.22s;box-shadow:0 4px 24px rgba(44,36,22,0.22);}
+.hero-cta-btn:hover{background:var(--sage);transform:translateY(-3px);box-shadow:0 8px 32px rgba(94,140,97,0.35)}
+
+/* ── ABOUT ── */
+.about-intro{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;padding:96px 80px}
+.img-wrap{position:relative}
+.about-img{width:100%;border-radius:var(--r-xl);aspect-ratio:4/3;object-fit:cover;display:block}
+.img-accent{position:absolute;bottom:-20px;right:-20px;background:var(--gold-light);border:1px solid rgba(244,197,66,0.4);border-radius:var(--r-lg);padding:18px 22px;}
+.ia-num{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--gold)}
+.ia-lbl{font-size:0.78rem;color:var(--ink2);margin-top:1px}
+.section-tag{display:inline-block;padding:4px 12px;border-radius:99px;font-size:0.73rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;background:var(--sage-light);color:var(--sage);margin-bottom:18px}
+.section-h{font-family:'DM Serif Display',serif;font-size:clamp(1.9rem,3vw,2.8rem);letter-spacing:-0.03em;line-height:1.15;color:var(--ink)}
+.section-p{font-size:0.98rem;color:var(--ink2);font-weight:300;line-height:1.78;margin-top:14px}
+.kpi-row{display:flex;gap:16px;margin-top:28px;flex-wrap:wrap}
+.kpi{padding:16px 20px;border-radius:var(--r-md);flex:1;min-width:110px}
+.kpi-n{font-family:'DM Serif Display',serif;font-size:1.7rem;line-height:1}
+.kpi-l{font-size:0.76rem;color:var(--ink2);margin-top:3px}
+
+/* ── HAPPINESS SCORE SECTION ── */
+.hs-section{padding:0 80px 64px}
+.hs-card{
+  background:#9FBDB7;
+  border:none;
+  border-radius:var(--r-xl);
+  padding:40px 48px;
+  display:grid;
+  grid-template-columns:1fr 1.1fr;
+  gap:48px;
+  /* FIX 1: vertically center both columns */
+  align-items:center;
+}
+.hs-label{font-size:0.72rem;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:18px}
+.hs-title{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--ink);margin-bottom:10px;letter-spacing:-0.02em}
+.top5-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.rank-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.45);border-radius:var(--r-md);padding:11px 16px;border:1px solid rgba(255,255,255,0.5);}
+.rank-num{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink3);width:22px;flex-shrink:0;text-align:center;}
+.rank-flag{font-size:1.3rem;flex-shrink:0;}
+.rank-country{font-size:0.88rem;font-weight:500;color:var(--ink);flex:1;}
+.rank-score{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink);flex-shrink:0;}
+.rank-bar-wrap{width:80px;height:6px;background:rgba(44,36,22,0.12);border-radius:99px;overflow:hidden;flex-shrink:0;}
+.rank-bar-fill{height:100%;border-radius:99px;background:rgba(44,36,22,0.35);}
+.rank-row:nth-child(1) .rank-num{color:#B8860B;font-size:1.25rem;}
+.rank-row:nth-child(2) .rank-num{color:#778899;font-size:1.2rem;}
+.rank-row:nth-child(3) .rank-num{color:#8B5E3C;font-size:1.15rem;}
+.hs-source{font-size:0.75rem;color:var(--ink3);margin-top:14px;}
+
+/* ── FACTOR CARDS ── */
+.factors-section{padding:0 80px 96px}
+.factors-header{text-align:center;margin-bottom:48px}
+.factors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.f-card{border-radius:var(--r-lg);overflow:hidden;transition:all 0.25s;border:1.5px solid transparent;display:flex;flex-direction:column}
+.f-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.12)}
+.f-img-wrap{width:100%;height:180px;background:white;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.f-img-wrap img{width:100%;height:100%;object-fit:contain;transition:transform 0.4s ease;}
+.f-card:hover .f-img-wrap img{transform:scale(1.05)}
+.f-img-placeholder{width:100%;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.72rem;font-weight:500;gap:8px;flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.07)}
+.f-body{padding:22px 24px 24px}
+.fc1{background:linear-gradient(145deg,#FDF6E3,#FAF0C8);border-color:#F2D27A}.fc1:hover{border-color:#D4A017}.fc1 .f-img-placeholder{background:#FAF0D0;color:#8A6800}.fc1 h4{color:#6B4E00}.fc1 p{color:#7A5C10}
+.fc2{background:linear-gradient(145deg,#FDE8E6,#FCDAD7);border-color:#F2A7A0}.fc2:hover{border-color:#D4706A}.fc2 .f-img-placeholder{background:#FCDDE0;color:#8A2830}.fc2 h4{color:#7A2830}.fc2 p{color:#8C3040}
+.fc3{background:linear-gradient(145deg,#EDFAF4,#D6F5E8);border-color:#9EE0C2}.fc3:hover{border-color:#5CC49A}.fc3 .f-img-placeholder{background:#D6F5E8;color:#1A6645}.fc3 h4{color:#1A6645}.fc3 p{color:#297854}
+.fc4{background:linear-gradient(145deg,#DCF0F5,#CCE6F0);border-color:#7FA7C9}.fc4:hover{border-color:#4F6D8A}.fc4 .f-img-placeholder{background:#CCE6F0;color:#2C4A6A}.fc4 h4{color:#2C4A6A}.fc4 p{color:#3A5878}
+.fc5{background:linear-gradient(145deg,#EDE8F7,#E0D8F2);border-color:#B7A7D9}.fc5:hover{border-color:#8878B8}.fc5 .f-img-placeholder{background:#E0D8F2;color:#3A2870}.fc5 h4{color:#3A2870}.fc5 p{color:#483280}
+.fc6{background:linear-gradient(145deg,#FFF3EC,#FFE5D5);border-color:#F5C4A0}.fc6:hover{border-color:#E0946A}.fc6 .f-img-placeholder{background:#FFE5D5;color:#7A3210}.fc6 h4{color:#7A3210}.fc6 p{color:#8C4220}
+.f-body h4{font-size:0.92rem;font-weight:600;margin-bottom:8px}
+.f-body p{font-size:0.83rem;line-height:1.68;font-weight:300}
+
+/* ── DASHBOARD ── */
+.dash-bg{background:radial-gradient(ellipse 700px 500px at 10% 20%,rgba(94,140,97,0.18) 0%,transparent 55%),radial-gradient(ellipse 600px 400px at 90% 80%,rgba(127,167,201,0.18) 0%,transparent 55%),radial-gradient(ellipse 400px 300px at 70% 20%,rgba(183,167,217,0.12) 0%,transparent 55%),var(--bg);}
+.dash-page{padding:20px 40px 20px}
+.dash-topbar{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;gap:24px}
+
+/* FIX 2: embed never overflows sideways */
+.dash-embed{
+  border-radius:var(--r-xl);
+  overflow:hidden;
+  border:1px solid var(--border);
+  box-shadow:0 4px 32px rgba(44,36,22,0.10);
+  background:#fff;
+  position:relative;
+  width:100%;
+  max-width:100%;
+}
+.dash-embed-inner{
+  width:100%;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  justify-content:center;
+}
+.dash-embed-inner iframe{
+  display:block;
+  border:0;
+  width:850px;
+  height:700px;
+  transform-origin:top center;
+  flex-shrink:0;
+}
+
+.dash-fullscreen-btn{
+  position:absolute;
+  bottom:14px;right:14px;
+  z-index:10;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;
+  border-radius:99px;
+  background:rgba(44,36,22,0.80);
+  color:#fff;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.8rem;font-weight:500;
+  border:1px solid rgba(255,255,255,0.18);
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  transition:all 0.2s;
+  letter-spacing:0.01em;
+}
+.dash-fullscreen-btn:hover{background:var(--sage);transform:translateY(-1px);box-shadow:0 4px 16px rgba(94,140,97,0.35);}
+.dash-fullscreen-btn svg{flex-shrink:0;}
+
+.dash-cta{margin-top:12px;background:rgba(255,255,255,0.5);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;backdrop-filter:blur(8px);}
+.dash-cta p{font-size:0.95rem;color:var(--ink2);font-weight:300;max-width:480px}
+.dash-cta strong{color:var(--ink);font-weight:600}
+
+/* ── FULLSCREEN DASHBOARD ── */
+.fullscreen-dash-page{display:none;position:fixed;inset:0;z-index:9999;background:#1a1a1a;flex-direction:column;}
+.fullscreen-dash-page.active{display:flex;}
+.fsd-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(246,241,233,0.97);border-bottom:1px solid var(--border);flex-shrink:0;}
+.fsd-title{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--ink);letter-spacing:-0.02em;display:flex;align-items:center;gap:10px;}
+.fsd-title span{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:400;color:var(--ink3);}
+.fsd-close-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:99px;background:var(--ink);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:500;border:none;cursor:pointer;transition:all 0.2s;}
+.fsd-close-btn:hover{background:var(--rose);}
+.fsd-iframe-wrap{flex:1;overflow:hidden;position:relative;}
+.fsd-iframe-wrap iframe{width:100%;height:100%;border:0;display:block;}
+
+/* ── DEVELOPER ── */
+.dev-section{background:var(--ink);padding:96px 80px;display:grid;grid-template-columns:1fr 1.4fr;gap:72px;align-items:center;}
+.dev-section .section-tag{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.65)}
+.dev-section .section-h{color:#fff}
+.dev-section .section-p{color:rgba(255,255,255,0.55);font-size:0.95rem;line-height:1.8}
+.dev-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--r-xl);padding:40px;}
+.dev-avatar{width:140px;height:140px;border-radius:50%;overflow:hidden;border:4px solid var(--sage-mid);margin-bottom:24px;}
+.dev-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.dev-name{font-family:'DM Serif Display',serif;font-size:1.5rem;color:#fff;margin-bottom:5px}
+.dev-id{font-size:0.84rem;color:rgba(255,255,255,0.45);margin-bottom:18px}
+.dev-divider{height:1px;background:rgba(255,255,255,0.1);margin:20px 0}
+.dev-info-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.dev-info-text{font-size:0.86rem;color:rgba(255,255,255,0.55);font-weight:300}
+.dev-info-text strong{color:rgba(255,255,255,0.8);font-weight:500}
+.chips{display:flex;gap:7px;margin-top:18px;flex-wrap:wrap}
+.chip{padding:5px 13px;border-radius:99px;font-size:0.75rem;font-weight:500;background:rgba(94,140,97,0.2);color:var(--sage-mid);border:1px solid rgba(143,191,143,0.3)}
+
+/* ── AWARENESS CHART ── */
+.awareness-section{padding:20px 80px 48px;background:radial-gradient(ellipse 600px 400px at 80% 50%,rgba(94,140,97,0.12) 0%,transparent 55%),var(--bg);border-top:1px solid var(--border);}
+.awareness-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;gap:20px;flex-wrap:wrap}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:var(--sage-light);border:1px solid var(--sage-mid);border-radius:99px;padding:5px 14px;font-size:0.73rem;font-weight:600;color:var(--sage);margin-bottom:14px;letter-spacing:0.06em;text-transform:uppercase}
+.chart-container{background:rgba(255,255,255,0.6);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px 32px;box-shadow:0 4px 32px rgba(44,36,22,0.07);backdrop-filter:blur(8px);max-width:720px;margin:0 auto;}
+.chart-legend{display:flex;gap:24px;margin-bottom:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:500;color:var(--ink2)}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.chart-inner{display:grid;grid-template-columns:1fr 160px;gap:16px;align-items:center;}
+.chart-wrap{position:relative;width:100%}
+.chart-stats-side{display:flex;flex-direction:column;gap:8px;}
+.cstat{background:rgba(255,255,255,0.5);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;text-align:center}
+.cstat-n{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--ink);line-height:1;margin-bottom:3px}
+.cstat-n.green{color:var(--sage)}.cstat-n.blue{color:var(--sky)}
+.cstat-l{font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink3)}
+.chart-summary{margin-top:16px;padding:14px 18px;background:rgba(255,255,255,0.5);border:1px solid var(--border);border-radius:var(--r-md);font-size:0.82rem;color:var(--ink2);line-height:1.65;font-weight:300}
+.chart-summary strong{color:var(--ink);font-weight:600}
+.chart-refresh{padding:8px 18px;border-radius:99px;background:transparent;border:1.5px solid var(--border);color:var(--ink2);font-size:0.8rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all 0.18s;display:inline-flex;align-items:center;gap:6px}
+.chart-refresh:hover{border-color:var(--sage);color:var(--sage)}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TEST CARD ── */
+.t-card{background:rgba(246,241,233,0.92);border:1px solid var(--border);border-radius:var(--r-xl);width:100%;max-width:680px;overflow:hidden;backdrop-filter:blur(12px);}
+.t-header{padding:32px 40px 26px;border-bottom:1px solid var(--border)}
+.t-pre-hdr{background:linear-gradient(135deg,var(--sage-light),rgba(246,241,233,0))}
+.t-post-hdr{background:linear-gradient(135deg,var(--rose-light),rgba(246,241,233,0))}
+.t-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px}
+.pre-badge{background:var(--sky-light);color:var(--sky);border:1px solid rgba(127,167,201,0.3)}
+.post-badge{background:var(--rose-light);color:var(--rose);border:1px solid rgba(242,167,160,0.5)}
+.t-header h2{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--ink);margin-bottom:5px}
+.t-header p{font-size:0.87rem;color:var(--ink2);font-weight:300}
+.t-prog{height:3px;background:var(--border)}
+.t-prog-fill{height:100%;transition:width 0.4s ease}
+.pre-fill{background:var(--sage)}.post-fill{background:var(--rose)}
+.t-body{padding:32px 40px}
+.q-num{font-size:0.72rem;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.q-text{font-size:1.02rem;font-weight:500;color:var(--ink);line-height:1.58;margin-bottom:28px}
+.likert-options{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.likert-opt{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px 14px;border-radius:var(--r-md);border:1.5px solid;cursor:pointer;transition:all 0.18s;background:transparent;font-family:'DM Sans',sans-serif}
+.likert-opt[data-val="1"]{border-color:#F2A7A0;background:#FFF5F5;color:#7A2830}
+.likert-opt[data-val="1"] .likert-num{background:#FDE8E6;color:#D4706A}
+.likert-opt[data-val="1"]:hover{background:#FDE8E6;border-color:#D4706A}
+.likert-opt[data-val="1"].sel{background:#FDE8E6;border-color:#D4706A;box-shadow:0 0 0 3px rgba(212,112,106,0.18)}
+.likert-opt[data-val="1"].sel .likert-num{background:#D4706A;color:#fff}
+.likert-opt[data-val="2"]{border-color:#F2D27A;background:#FFFBF0;color:#6B4E00}
+.likert-opt[data-val="2"] .likert-num{background:#FDF3CC;color:#D4A017}
+.likert-opt[data-val="2"]:hover{background:#FDF3CC;border-color:#D4A017}
+.likert-opt[data-val="2"].sel{background:#FDF3CC;border-color:#D4A017;box-shadow:0 0 0 3px rgba(212,160,23,0.18)}
+.likert-opt[data-val="2"].sel .likert-num{background:#D4A017;color:#fff}
+.likert-opt[data-val="3"]{border-color:#7FA7C9;background:#F4FAFF;color:#2C4A6A}
+.likert-opt[data-val="3"] .likert-num{background:#DCF0F5;color:#4F6D8A}
+.likert-opt[data-val="3"]:hover{background:#DCF0F5;border-color:#4F6D8A}
+.likert-opt[data-val="3"].sel{background:#DCF0F5;border-color:#4F6D8A;box-shadow:0 0 0 3px rgba(79,109,138,0.18)}
+.likert-opt[data-val="3"].sel .likert-num{background:#4F6D8A;color:#fff}
+.likert-opt[data-val="4"]{border-color:#8FBF8F;background:#F4FBF4;color:#1A6645}
+.likert-opt[data-val="4"] .likert-num{background:#D6EBD6;color:#5E8C61}
+.likert-opt[data-val="4"]:hover{background:#D6EBD6;border-color:#5E8C61}
+.likert-opt[data-val="4"].sel{background:#D6EBD6;border-color:#5E8C61;box-shadow:0 0 0 3px rgba(94,140,97,0.18)}
+.likert-opt[data-val="4"].sel .likert-num{background:#5E8C61;color:#fff}
+.likert-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;transition:all 0.18s;flex-shrink:0}
+.likert-word{font-size:0.72rem;font-weight:500;text-align:center;line-height:1.3}
+.scale-legend{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:10px 14px;background:rgba(255,255,255,0.5);border-radius:var(--r-sm);border:1px solid var(--border)}
+.scale-legend span{font-size:0.76rem;color:var(--ink3);font-weight:500}
+.q-error{display:none;background:#FDE8E6;border:1px solid #F2A7A0;border-radius:var(--r-sm);padding:10px 14px;font-size:0.82rem;color:#7A2830;font-weight:500;margin-top:14px;text-align:center}
+.q-error.show{display:block}
+.t-footer{padding:20px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.t-step{font-size:0.83rem;color:var(--ink3)}
+.t-btns{display:flex;gap:9px}
+.btn-bk{padding:9px 20px;border-radius:99px;background:transparent;border:1.5px solid var(--border);color:var(--ink2);font-size:0.85rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all 0.18s}
+.btn-bk:hover{border-color:var(--ink);color:var(--ink)}
+.btn-nx{padding:9px 24px;border-radius:99px;background:var(--ink);color:#fff;font-size:0.85rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all 0.18s}
+.btn-nx:hover{background:var(--sage)}.btn-nx.sub{background:var(--sage)}.btn-nx.sub:hover{background:var(--ink)}
+.btn-dark{padding:13px 30px;border-radius:99px;background:var(--ink);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-dark:hover{background:var(--sage);transform:translateY(-2px)}
+.btn-outline{padding:13px 26px;border-radius:99px;background:transparent;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;border:1.5px solid var(--border);transition:all 0.2s}
+.btn-outline:hover{border-color:var(--ink)}
+
+/* ── RESULTS ── */
+.res-wrap{padding:44px 40px;text-align:center;display:none}
+.res-wrap.show{display:block;animation:fadeUp 0.45s ease}
+.res-ring{width:82px;height:82px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;background:var(--sage-light);border:2px solid var(--sage-mid);font-size:2.2rem}
+.res-wrap h2{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--ink);margin-bottom:8px}
+.res-wrap .sub{color:var(--ink2);font-size:0.9rem;font-weight:300;margin-bottom:28px}
+.kpi-results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.kpi-r{background:rgba(255,255,255,0.4);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 16px;text-align:center}
+.kpi-r.highlight{background:var(--sage-light);border-color:var(--sage-mid)}
+.kpi-r .rn{font-family:'DM Serif Display',serif;font-size:2rem;line-height:1;color:var(--ink);margin-bottom:4px}
+.kpi-r.highlight .rn{color:var(--sage)}
+.kpi-r .rl{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink3)}
+.kpi-r .rs{font-size:0.75rem;color:var(--ink3);margin-top:3px;font-weight:300}
+.score-compare{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:20px}
+.sc-box{background:rgba(255,255,255,0.4);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 24px;text-align:center;min-width:110px}
+.sc-box.post-box{background:var(--sage-light);border-color:var(--sage-mid)}
+.sc-n{font-family:'DM Serif Display',serif;font-size:2rem;line-height:1;margin-bottom:3px}
+.sc-l{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink3)}
+.sc-s{font-size:0.72rem;color:var(--ink3);margin-top:2px}
+.sc-arr{font-size:1.6rem;color:var(--border)}
+.sc-box.post-box .sc-n{color:var(--sage)}
+.res-desc-box{background:rgba(255,255,255,0.4);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 20px;margin-bottom:24px;text-align:left;font-size:0.88rem;color:var(--ink2);line-height:1.65;font-weight:300}
+.res-desc-box strong{color:var(--ink);font-weight:600}
+.res-btns{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+.pre-score-card{background:var(--sage-light);border:1.5px solid var(--sage-mid);border-radius:var(--r-lg);padding:24px;margin-bottom:20px;display:inline-block;min-width:180px}
+.pre-score-card .psn{font-family:'DM Serif Display',serif;font-size:2.5rem;color:var(--sage);line-height:1;margin-bottom:4px}
+.pre-score-card .psl{font-size:0.73rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--sage)}
+.pre-score-card .pss{font-size:0.78rem;color:var(--ink3);margin-top:4px}
+.page-locked-inner{padding:36px 40px;text-align:center}
+
+/* ── FOOTER ── */
+.site-footer{background:var(--ink);padding:20px 80px;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.footer-copy{font-size:0.78rem;color:rgba(255,255,255,0.4)}
+.footer-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;background:rgba(94,140,97,0.2);border:1px solid rgba(143,191,143,0.25);font-size:0.74rem;color:var(--sage-mid);font-weight:500;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.q-panel{animation:slideIn 0.25s ease}
+
+@media(max-width:900px){
+  .hero-content{padding:60px 24px}.hero-title{font-size:2.8rem}
+  .about-intro{grid-template-columns:1fr;gap:40px;padding:60px 24px}
+  .img-accent{display:none}
+  .hs-section{padding:0 24px 48px}.hs-card{grid-template-columns:1fr;padding:28px 24px;gap:28px}
+  .factors-section{padding:0 24px 60px}.factors-grid{grid-template-columns:1fr 1fr}
+  .dev-section{padding:60px 24px;grid-template-columns:1fr;gap:40px}
+  .dash-page{padding:40px 24px}.dash-topbar{flex-direction:column;align-items:flex-start}
+  .dash-cta{flex-direction:column;text-align:center}
+  .kpi-results{grid-template-columns:1fr 1fr}
+  .awareness-section{padding:60px 24px 48px}
+  .chart-inner{grid-template-columns:1fr;}
+  .chart-stats-side{flex-direction:row;flex-wrap:wrap;}
+  .chart-stats-side .cstat{flex:1;min-width:100px;}
+  .awareness-header{flex-direction:column;align-items:flex-start}
+  .site-footer{padding:18px 24px}.footer-bottom{flex-direction:column;align-items:flex-start;gap:8px}
+}
+@media(max-width:600px){
+  .factors-grid{grid-template-columns:1fr}
+  .t-header,.t-body,.t-footer,.res-wrap{padding-left:22px;padding-right:22px}
+  .likert-options{gap:5px}.likert-opt{padding:12px 4px 10px}
+  .likert-num{width:28px;height:28px;font-size:0.8rem}.likert-word{font-size:0.65rem}
+  .kpi-results{grid-template-columns:1fr 1fr}
+  .score-compare{gap:8px}.sc-box{padding:14px 16px;min-width:90px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="logo" onclick="goHome();closeMobileNav()">
+    <div class="logo-mark"><img src="logo.png" alt="logo"></div>
+    <span class="logo-text">haplictics</span>
+  </button>
+  <button class="hamburger" onclick="toggleMobileNav()" id="hamburger-btn">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <nav id="main-nav">
+    <button class="nav-btn" id="nav-home" onclick="goHome();closeMobileNav()">Home</button>
+    <button class="nav-btn" id="nav-about" onclick="goHome('about');closeMobileNav()">Insight</button>
+    <button class="nav-btn" id="nav-dashboard" onclick="goHome('dashboard');closeMobileNav()">Dashboard</button>
+    <button class="nav-btn" id="nav-developer" onclick="goHome('developer');closeMobileNav()">About Dev</button>
+    <button class="nav-cta" onclick="showTest('pretest');closeMobileNav()">Take Pre-Test</button>
+    <button class="nav-cta-post" onclick="goPostTest();closeMobileNav()">Take Post-Test</button>
+    <button class="nav-btn" id="nav-results" onclick="goHome('awareness-chart');closeMobileNav()">Pre &amp; Post Result</button>
+  </nav>
+</header>
+
+<div class="journey-bar" id="journey-bar">
+  <div class="journey-track">
+    <div class="journey-step" id="jstep-pre" onclick="showTest('pretest')" style="cursor:pointer" title="Take Pre-Test">
+      <div class="step-icon" id="jicon-pre">1</div>
+      <span class="step-label">Pre-Test</span>
+      <span class="step-label-short">Pre</span>
+    </div>
+    <div class="journey-connector" id="jcon-1">
+      <div class="jdot"></div><div class="jdot"></div><div class="jdot"></div>
+    </div>
+    <div class="journey-step locked" id="jstep-dash" title="Explore Dashboard">
+      <div class="step-icon" id="jicon-dash">2</div>
+      <span class="step-label">Dashboard</span>
+      <span class="step-label-short">Dash</span>
+    </div>
+    <div class="journey-connector" id="jcon-2">
+      <div class="jdot"></div><div class="jdot"></div><div class="jdot"></div>
+    </div>
+    <div class="journey-step locked" id="jstep-post" title="Take Post-Test">
+      <div class="step-icon" id="jicon-post">3</div>
+      <span class="step-label">Post-Test</span>
+      <span class="step-label-short">Post</span>
+    </div>
+  </div>
+</div>
+
+<div id="main-content" class="main-section">
+
+  <!-- 1. HOME -->
+  <section id="home" class="section-anchor">
+    <div class="hero">
+      <div class="hero-bg">
+        <div class="blob blob1"></div><div class="blob blob2"></div>
+        <div class="blob blob3"></div><div class="blob blob4"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-eyebrow"><span class="pulse"></span>World Happiness Index &middot; 2015–2025</div>
+        <h1 class="hero-title">What makes the<br><em>world</em> truly<br>happy?</h1>
+        <button class="hero-cta-btn" onclick="showTest('pretest')">
+          Begin Pre-Test
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 7.5h10M9 4l3.5 3.5L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. INSIGHT -->
+  <section id="about" class="section-anchor">
+    <div class="about-intro">
+      <div class="img-wrap">
+        <img class="about-img" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=700&q=80" alt="Smiling children">
+        <div class="img-accent"><div class="ia-num">2025</div><div class="ia-lbl">Latest report</div></div>
+      </div>
+      <div>
+        <div class="section-tag">About World Happiness Index</div>
+        <h2 class="section-h">What is the World Happiness Index?</h2>
+        <p class="section-p">The World Happiness Index measures happiness across countries. It is based on the World Happiness Report published by the United Nations.</p>
+        <p class="section-p" style="margin-top:14px">The report started in 2012, but this study uses data from <strong style="color:var(--ink);font-weight:600">2015 to 2025</strong>. It helps compare global happiness and well-being over time.</p>
+        <div class="kpi-row">
+          <div class="kpi" style="background:var(--sage-light);border:1px solid var(--sage-mid)"><div class="kpi-n" style="color:var(--sage)">157+</div><div class="kpi-l">Countries indexed</div></div>
+          <div class="kpi" style="background:var(--gold-light);border:1px solid rgba(244,197,66,0.4)"><div class="kpi-n" style="color:var(--gold)">10 yrs</div><div class="kpi-l">In this study</div></div>
+          <div class="kpi" style="background:var(--sky-light);border:1px solid rgba(127,167,201,0.3)"><div class="kpi-n" style="color:var(--sky)">6</div><div class="kpi-l">Happiness factors</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAPPINESS SCORE SECTION -->
+    <div class="hs-section">
+      <div class="hs-card">
+        <!-- Left col — align-items:center on .hs-card centers this vertically -->
+        <div>
+          <div class="section-tag">2025 Rankings</div>
+          <div class="hs-title">Top 5 Happiest<br>Countries (2025)</div>
+          <p style="font-size:0.85rem;color:rgb(12,12,12);font-weight:300;line-height:1.7;margin-top:8px;margin-bottom:20px">Nordic countries continue to dominate the World Happiness Report, consistently leading across all six well-being factors.</p>
+          <div class="hs-source">Source: World Happiness Report 2025</div>
+        </div>
+
+        <!-- Right col -->
+        <div>
+          <div class="hs-label">Happiness Score — Top 5</div>
+          <div class="top5-list">
+            <div class="rank-row">
+              <div class="rank-num">🥇</div>
+              <div class="rank-flag">🇫🇮</div>
+              <div class="rank-country">Finland</div>
+              <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:97%"></div></div>
+              <div class="rank-score">7.74</div>
+            </div>
+            <div class="rank-row">
+              <div class="rank-num">🥈</div>
+              <div class="rank-flag">🇩🇰</div>
+              <div class="rank-country">Denmark</div>
+              <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:90%"></div></div>
+              <div class="rank-score">7.52</div>
+            </div>
+            <div class="rank-row">
+              <div class="rank-num">🥉</div>
+              <div class="rank-flag">🇮🇸</div>
+              <div class="rank-country">Iceland</div>
+              <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:87%"></div></div>
+              <div class="rank-score">7.51</div>
+            </div>
+            <div class="rank-row">
+              <div class="rank-num" style="font-size:0.85rem;color:var(--ink3);">4</div>
+              <div class="rank-flag">🇸🇪</div>
+              <div class="rank-country">Sweden</div>
+              <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:82%"></div></div>
+              <div class="rank-score">7.34</div>
+            </div>
+            <div class="rank-row">
+              <div class="rank-num" style="font-size:0.85rem;color:var(--ink3);">5</div>
+              <div class="rank-flag">🇮🇱</div>
+              <div class="rank-country">Israel</div>
+              <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:80%"></div></div>
+              <div class="rank-score">7.23</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px;">
+            <div style="flex:1;height:1px;background:rgba(44,36,22,0.15);"></div>
+            <span style="font-size:0.72rem;color:var(--ink3);white-space:nowrap;font-weight:600;letter-spacing:0.06em;">VS MALAYSIA</span>
+            <div style="flex:1;height:1px;background:rgba(44,36,22,0.15);"></div>
+          </div>
+          <div class="rank-row" style="background:rgba(79,109,138,0.18);border:2px solid rgba(79,109,138,0.45);padding:14px 16px;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(79,109,138,0.08),transparent);pointer-events:none;"></div>
+            <div class="rank-num" style="font-size:0.85rem;color:var(--teal);font-weight:700;">51</div>
+            <div class="rank-flag">🇲🇾</div>
+            <div style="flex:1;">
+              <div class="rank-country" style="color:var(--teal);font-weight:600;font-size:0.9rem;">Malaysia</div>
+              <div style="font-size:0.68rem;color:var(--teal);opacity:0.75;margin-top:1px;font-weight:500;">#1 in Southeast Asia · Upper-middle tier</div>
+            </div>
+            <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:62%;background:var(--teal);opacity:0.8;"></div></div>
+            <div class="rank-score" style="color:var(--teal);">5.95</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="factors-section">
+      <div class="factors-header">
+        <div class="section-tag">The Six Factors</div>
+        <h2 class="section-h">Factors that influence the<br>World Happiness Report</h2>
+        <p class="section-p" style="max-width:520px;margin:0 auto">Each country is scored across six dimensions that together paint a complete picture of national well-being.</p>
+      </div>
+      <div class="factors-grid">
+        <div class="f-card fc1"><div class="f-img-wrap"><img src="factor1.jpg" alt="GDP Per Capita" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="f-img-placeholder" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="13" width="4" height="8" rx="1" stroke="#8A6800" stroke-width="1.5"/><rect x="10" y="9" width="4" height="12" rx="1" stroke="#8A6800" stroke-width="1.5"/><rect x="17" y="5" width="4" height="16" rx="1" stroke="#8A6800" stroke-width="1.5"/></svg>Upload factor1.jpg</div></div><div class="f-body"><h4>GDP Per Capita</h4><p>Average income per person in a country, showing economic strength and the living standards citizens can realistically achieve.</p></div></div>
+        <div class="f-card fc2"><div class="f-img-wrap"><img src="factor2.jpg" alt="Social Support" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="f-img-placeholder" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#8A2830" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="#8A2830" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#8A2830" stroke-width="1.5" stroke-linecap="round"/></svg>Upload factor2.jpg</div></div><div class="f-body"><h4>Social Support</h4><p>The perceived ability to count on friends or family during difficult times.</p></div></div>
+        <div class="f-card fc3"><div class="f-img-wrap"><img src="factor3.jpg" alt="Healthy Life Expectancy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="f-img-placeholder" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#1A6645" stroke-width="1.5"/></svg>Upload factor3.jpg</div></div><div class="f-body"><h4>Healthy Life Expectancy</h4><p>How long people can expect to live in good physical and mental health.</p></div></div>
+        <div class="f-card fc4"><div class="f-img-wrap"><img src="factor4.jpg" alt="Generosity" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="f-img-placeholder" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 12v10H4V12" stroke="#2C4A6A" stroke-width="1.5" stroke-linecap="round"/><path d="M22 7H2v5h20V7z" stroke="#2C4A6A" stroke-width="1.5"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" stroke="#2C4A6A" stroke-width="1.5" stroke-linecap="round"/></svg>Upload factor4.jpg</div></div><div class="f-body"><h4>Generosity</h4><p>Willingness to help others, such as through donations or kind actions.</p></div></div>
+        <div class="f-card fc5"><div class="f-img-wrap"><img src="factor5.jpg" alt="Freedom" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="f-img-placeholder" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3A2870" stroke-width="1.5"/><path d="M12 8l4 4-4 4-4-4 4-4z" stroke="#3A2870" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Upload factor5.jpg</div></div><div class="f-body"><h4>Freedom</h4><p>The ability to make personal life choices and live based on one's own decisions.</p></div></div>
+        <div class="f-card fc6"><div class="f-img-wrap"><img src="factor6.jpg" alt="Corruption Perception" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="f-img-placeholder" style="display:none"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#7A3210" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#7A3210" stroke-width="1.5" stroke-linecap="round"/></svg>Upload factor6.jpg</div></div><div class="f-body"><h4>Corruption Perception</h4><p>How much people believe their government and institutions are honest and trustworthy.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. DASHBOARD -->
+  <section id="dashboard" class="section-anchor">
+    <div class="dash-bg">
+      <div class="dash-page">
+        <div class="dash-topbar">
+          <div>
+            <div class="section-tag">Interactive Dashboard</div>
+            <h2 style="font-family:'DM Serif Display',serif;font-size:2.2rem;letter-spacing:-0.03em;color:var(--ink);margin-top:8px;margin-bottom:6px">World Happiness Dashboard</h2>
+            <p style="color:var(--ink2);font-size:0.9rem;font-weight:300">Explore happiness trends across 157 countries &middot; 2015–2025</p>
+          </div>
+          <button class="btn-outline" onclick="showTest('pretest')" style="white-space:nowrap;align-self:flex-end">&#8592; Take Pre-Test First</button>
+        </div>
+
+        <!-- FIX 2: embed stays within bounds, fullscreen button overlaid -->
+        <div class="dash-embed" id="dash-embed">
+          <button class="dash-fullscreen-btn" onclick="openFullscreenDash()" title="Open Full View">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
+            </svg>
+            Open Full View
+          </button>
+          <div class="dash-embed-inner" id="dash-scale-wrap">
+            <iframe
+              id="pbi-iframe"
+              title="World Happiness Dashboard"
+              width="850"
+              height="700"
+              src="https://app.powerbi.com/view?r=eyJrIjoiNTM1ZjAxZTEtZGE5Ni00MWZjLWFlNWItNmYzY2UzMDI5OThlIiwidCI6ImNkY2JiMGUyLTlmZWEtNGY1NC04NjcwLTY3MjcwNzc5N2FkYSIsImMiOjEwfQ%3D%3D"
+              frameborder="0"
+              allowFullScreen="true">
+            </iframe>
+          </div>
+        </div>
+
+        <div class="dash-cta">
+          <div>
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:5px">Done exploring the dashboard?</h3>
+            <p>Take the <strong>Post-Test</strong> to see how much your awareness of the World Happiness Index has grown.</p>
+          </div>
+          <button class="btn-dark" onclick="goPostTest()" style="white-space:nowrap;flex-shrink:0">Take Post-Test &#8594;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. AWARENESS CHART -->
+  <section id="awareness-chart" class="section-anchor awareness-section">
+    <div class="awareness-header">
+      <div>
+        <div class="live-badge"><span class="pulse"></span>Live Data</div>
+        <h2 class="section-h" style="font-size:clamp(1.6rem,2.5vw,2.2rem)">Awareness Test Results</h2>
+        <p class="section-p" style="margin-top:8px;max-width:480px">Average Pre-Test vs Post-Test scores from all respondents. Updated automatically after each submission.</p>
+      </div>
+      <button class="chart-refresh" id="refresh-btn" onclick="loadChartData()">
+        <span id="refresh-icon">&#8635;</span> Refresh Data
+      </button>
+    </div>
+    <div class="chart-container">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:600;color:var(--ink);margin-bottom:8px">Average Awareness Score (Pre vs Post)</div>
+        <div class="chart-legend" style="justify-content:center">
+          <div class="legend-item"><div class="legend-dot" style="background:#4DBFA8"></div>Pre-Test Average</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#F2607A"></div>Post-Test Average</div>
+        </div>
+      </div>
+      <div class="chart-inner">
+        <div class="chart-wrap" id="chart-area"></div>
+        <div class="chart-stats-side" id="chart-stats" style="display:none">
+          <div class="cstat"><div class="cstat-n" id="stat-respondents">0</div><div class="cstat-l">Total Respondents</div></div>
+          <div class="cstat"><div class="cstat-n blue" id="stat-pre-avg">–</div><div class="cstat-l">Avg Pre-Test Score</div></div>
+          <div class="cstat"><div class="cstat-n green" id="stat-post-avg">–</div><div class="cstat-l">Avg Post-Test Score</div></div>
+        </div>
+      </div>
+      <div class="chart-summary">
+        <strong>How to read this chart?:</strong> The bars show the average score of all respondents before and after exploring the dashboard. If the <strong>Post-Test score is higher</strong> than the Pre-Test score, it means the dashboard was <strong>effective</strong> in improving awareness about the World Happiness Index.
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ABOUT DEV -->
+  <section id="developer" class="section-anchor">
+    <div class="dev-section">
+      <div>
+        <div class="section-tag">The Developer</div>
+        <h2 class="section-h">About this project</h2>
+        <p class="section-p">This website was developed as part of a final year project exploring global happiness data through interactive data visualisation and user awareness measurement.</p>
+        <p class="section-p" style="margin-top:14px">The goal is to bridge the gap between complex happiness data and public understanding and making global insights accessible and meaningful to everyone.</p>
+      </div>
+      <div class="dev-card">
+        <div class="dev-avatar"><img src="image.jpg" alt="Developer"></div>
+        <div class="dev-name">Wan Hasya Wadhihah Binti Wan Yusoff</div>
+        <div class="dev-id">Student ID: 2023226158</div>
+        <div class="dev-divider"></div>
+        <div class="dev-info-row"><span class="dev-info-text"><strong>Bachelor in Information Technology (Hons)</strong></span></div>
+        <div class="dev-info-row"><span class="dev-info-text"><strong>Focus:</strong> Data Visualisation &amp; User Awareness Research</span></div>
+        <div class="dev-info-row"><span class="dev-info-text"><strong>Tool:</strong> Power BI embedded within a custom built website</span></div>
+        <div class="chips"><span class="chip">Power BI</span><span class="chip">Data Visualisation</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-bottom">
+      <span class="footer-copy">&#169; 2025 Haplictics &middot; Wan Hasya Wadhihah Binti Wan Yusoff &middot; 2023226158</span>
+      <span class="footer-badge">World Happiness Index 2015–2025</span>
+    </div>
+  </footer>
+
+</div><!-- end #main-content -->
+
+<!-- FULLSCREEN DASHBOARD PAGE -->
+<div class="fullscreen-dash-page" id="fullscreen-dash-page">
+  <div class="fsd-topbar">
+    <div class="fsd-title">
+      &#127757; World Happiness Dashboard
+      <span>&middot; Full View</span>
+    </div>
+    <button class="fsd-close-btn" onclick="closeFullscreenDash()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+      Close Full View
+    </button>
+  </div>
+  <div class="fsd-iframe-wrap">
+    <iframe
+      id="pbi-fullscreen-iframe"
+      title="World Happiness Dashboard — Full View"
+      src=""
+      frameborder="0"
+      allowFullScreen="true">
+    </iframe>
+  </div>
+</div>
+
+<!-- PRE-TEST PAGE -->
+<div id="page-pretest" class="test-page">
+  <div class="t-card">
+    <div id="pre-hdr" class="t-header t-pre-hdr">
+      <div class="t-badge pre-badge">Pre-Test</div>
+      <h2>Awareness Survey</h2>
+      <p>Rate your level of agreement with each statement <strong>before</strong> exploring the dashboard. There are no right or wrong answers — be honest!</p>
+    </div>
+    <div class="t-prog"><div class="t-prog-fill pre-fill" id="pre-pg" style="width:20%"></div></div>
+    <div id="pre-body" class="t-body"><div id="pre-qw"></div></div>
+    <div id="pre-ft" class="t-footer">
+      <span class="t-step" id="pre-st">Statement 1 of 5</span>
+      <div class="t-btns">
+        <button class="btn-bk" id="pre-bk" onclick="preNav(-1)" style="display:none">Back</button>
+        <button class="btn-nx" id="pre-nx" onclick="preNav(1)">Next &#8594;</button>
+      </div>
+    </div>
+    <div class="res-wrap" id="pre-res">
+      <div class="res-ring">&#127881;</div>
+      <h2>Pre-Test Complete!</h2>
+      <p class="sub">Your baseline awareness has been recorded. Now explore the dashboard to learn about global happiness trends.</p>
+      <div style="margin-bottom:20px">
+        <div class="pre-score-card">
+          <div class="psn" id="pre-score-num">–</div>
+          <div class="psl">Average Score</div>
+          <div class="pss">out of 4.00 (Pre-Test)</div>
+        </div>
+      </div>
+      <div class="res-btns" style="margin-top:20px">
+        <button class="btn-dark" onclick="goHome('dashboard')">View Dashboard &#8594;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST-TEST PAGE -->
+<div id="page-posttest" class="test-page">
+  <div class="t-card">
+    <div id="post-hdr" class="t-header t-post-hdr">
+      <div class="t-badge post-badge">Post-Test</div>
+      <h2>Awareness Survey</h2>
+      <p>Rate the <strong>same statements</strong> again after exploring the dashboard. Let's measure how your awareness has changed!</p>
+    </div>
+    <div class="t-prog"><div class="t-prog-fill post-fill" id="post-pg" style="width:20%"></div></div>
+    <div id="post-body" class="t-body"><div id="post-qw"></div></div>
+    <div id="post-ft" class="t-footer">
+      <span class="t-step" id="post-st">Statement 1 of 5</span>
+      <div class="t-btns">
+        <button class="btn-bk" id="post-bk" onclick="postNav(-1)" style="display:none">Back</button>
+        <button class="btn-nx" id="post-nx" onclick="postNav(1)">Next &#8594;</button>
+      </div>
+    </div>
+    <div class="res-wrap" id="post-res">
+      <div class="res-ring">&#127942;</div>
+      <h2>Your Results</h2>
+      <p class="sub" id="res-desc">Here's how your awareness of the World Happiness Index changed.</p>
+      <div class="score-compare">
+        <div class="sc-box"><div class="sc-n" id="pre-sd">–</div><div class="sc-l">Pre-Test</div><div class="sc-s">Before dashboard</div></div>
+        <div class="sc-arr">&#8594;</div>
+        <div class="sc-box post-box"><div class="sc-n" id="post-sd">–</div><div class="sc-l">Post-Test</div><div class="sc-s">After dashboard</div></div>
+      </div>
+      <div class="kpi-results">
+        <div class="kpi-r"><div class="rn" id="res-imp-pct">–</div><div class="rl">Improvement</div><div class="rs">Percentage change</div></div>
+        <div class="kpi-r highlight"><div class="rn" id="res-status-icon">–</div><div class="rl" id="res-status-label">Status</div><div class="rs" id="res-status-sub"></div></div>
+      </div>
+      <div class="res-desc-box" id="res-conclusion"></div>
+      <div class="res-btns">
+        <button class="btn-dark" onclick="goHome()">Back to Home</button>
+        <button class="btn-outline" onclick="goHome('dashboard')">Revisit Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOCKED PAGE -->
+<div id="page-locked" class="test-page">
+  <div class="t-card">
+    <div class="t-header t-post-hdr">
+      <div class="t-badge post-badge">Locked</div>
+      <h2>Pre-Test Required</h2>
+      <p>You need to complete the <strong>Pre-Test first</strong> before you can take the Post-Test.</p>
+    </div>
+    <div class="page-locked-inner">
+      <div style="font-size:3.5rem;margin-bottom:20px">&#128274;</div>
+      <p style="color:var(--ink2);font-size:0.92rem;line-height:1.7;margin-bottom:28px;font-weight:300">The Post-Test is only available <strong style="color:var(--ink)">after</strong> you have completed the Pre-Test and explored the Dashboard.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;text-align:left">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--sage-light);border:1px solid var(--sage-mid);border-radius:var(--r-md)"><span>1</span><span style="font-size:0.88rem;color:var(--ink2)">Complete the <strong style="color:var(--ink)">Pre-Test</strong></span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--sky-light);border:1px solid rgba(127,167,201,0.3);border-radius:var(--r-md)"><span>2</span><span style="font-size:0.88rem;color:var(--ink2)">Explore the <strong style="color:var(--ink)">Dashboard</strong></span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--rose-light);border:1px solid rgba(242,167,160,0.4);border-radius:var(--r-md)"><span>3</span><span style="font-size:0.88rem;color:var(--ink2)">Take the <strong style="color:var(--ink)">Post-Test</strong></span></div>
+      </div>
+      <button class="btn-dark" onclick="showTest('pretest')" style="width:100%;justify-content:center">Start Pre-Test Now &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbx1iz_wk1ENRqmr658r4sVQDQX0M02VtERpC7NjKIXtbxR3ZcK0Yg2xlJtMt7Bm4NDOnA/exec";
+const PBI_SRC = "https://app.powerbi.com/view?r=eyJrIjoiNTM1ZjAxZTEtZGE5Ni00MWZjLWFlNWItNmYzY2UzMDI5OThlIiwidCI6ImNkY2JiMGUyLTlmZWEtNGY1NC04NjcwLTY3MjcwNzc5N2FkYSIsImMiOjEwfQ%3D%3D";
+
+const Q = [
+  "I understand what the World Happiness Index represents.",
+  "I am aware that happiness is influenced by multiple factors, not only economic growth.",
+  "I understand that factors such as social support, health, and freedom contribute to happiness levels.",
+  "I am aware that happiness levels vary between countries and are not determined solely by national wealth.",
+  "I can interpret basic patterns and trends in global happiness data."
+];
+const LIKERT_LABELS = [
+  {num:1,word:"Strongly\nDisagree"},{num:2,word:"Disagree"},
+  {num:3,word:"Agree"},{num:4,word:"Strongly\nAgree"}
+];
+
+let preA = new Array(Q.length).fill(null);
+let postA = new Array(Q.length).fill(null);
+let preCur = 0, postCur = 0;
+let preAvg = null;
+let sessionId = Date.now();
+
+function closeMobileNav(){document.getElementById('main-nav').classList.remove('open');}
+function toggleMobileNav(){document.getElementById('main-nav').classList.toggle('open');}
+document.addEventListener('click',function(e){
+  const nav=document.getElementById('main-nav');
+  const hamburger=document.getElementById('hamburger-btn');
+  if(nav.classList.contains('open')&&!nav.contains(e.target)&&!hamburger.contains(e.target)){nav.classList.remove('open');}
+});
+
+function openFullscreenDash(){
+  const iframe=document.getElementById('pbi-fullscreen-iframe');
+  iframe.src=PBI_SRC;
+  document.getElementById('fullscreen-dash-page').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closeFullscreenDash(){
+  document.getElementById('fullscreen-dash-page').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+function getJourneyState(){return sessionStorage.getItem('haplictics_journey')||'pre';}
+function setJourneyState(state){sessionStorage.setItem('haplictics_journey',state);updateJourneyBar();}
+
+function updateJourneyBar(){
+  const state=getJourneyState();
+  const stateOrder={pre:0,dashboard:1,post:2,done:3};
+  const currentIdx=stateOrder[state]??0;
+  const checkmark='✓';
+  const stepEls=['jstep-pre','jstep-dash','jstep-post'].map(id=>document.getElementById(id));
+  const iconEls=['jicon-pre','jicon-dash','jicon-post'].map(id=>document.getElementById(id));
+  const connEls=['jcon-1','jcon-2'].map(id=>document.getElementById(id));
+  stepEls.forEach((el,i)=>{
+    el.classList.remove('active','done','locked');
+    if(i<currentIdx){el.classList.add('done');iconEls[i].textContent=checkmark;}
+    else if(i===currentIdx){el.classList.add('active');iconEls[i].textContent=i+1;}
+    else{el.classList.add('locked');iconEls[i].textContent=i+1;}
+  });
+  connEls.forEach((el,i)=>{el.classList.toggle('done',i+1<=currentIdx);});
+  const dashStep=document.getElementById('jstep-dash');
+  if(currentIdx>=1){dashStep.style.cursor='pointer';dashStep.onclick=()=>goHome('dashboard');}
+  else{dashStep.style.cursor='default';dashStep.onclick=null;}
+  const postStep=document.getElementById('jstep-post');
+  if(currentIdx>=2){postStep.style.cursor='pointer';postStep.onclick=()=>goPostTest();}
+  else{postStep.style.cursor='default';postStep.onclick=null;}
+}
+
+const NAV_MAP={'home':'nav-home','about':'nav-about','dashboard':'nav-dashboard','awareness-chart':'nav-results','developer':'nav-developer'};
+function setActiveNav(sectionKey){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById(NAV_MAP[sectionKey]||'nav-home');
+  if(btn)btn.classList.add('active');
+}
+
+function showTest(testId){
+  closeMobileNav();
+  document.getElementById('main-content').style.display='none';
+  document.getElementById('journey-bar').style.display='none';
+  document.querySelectorAll('.test-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+testId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome(section){
+  document.getElementById('main-content').style.display='block';
+  document.getElementById('journey-bar').style.display='flex';
+  document.querySelectorAll('.test-page').forEach(p=>p.classList.remove('active'));
+  window.scrollTo(0,0);
+  if(section==='dashboard'&&preAvg!==null){if(getJourneyState()==='pre')setJourneyState('dashboard');}
+  setActiveNav(section||'home');
+  if(section){setTimeout(()=>{const el=document.getElementById(section);if(el)el.scrollIntoView({behavior:'smooth'});},50);}
+}
+
+function goPostTest(){
+  if(preAvg===null){showTest('locked');}
+  else{startPostTest();showTest('posttest');}
+}
+
+/* FIX 2: Always apply scale on load AND resize — Math.min(1,...) so desktop never overflows */
+function scaleDashIframe(){
+  const wrap=document.getElementById('dash-scale-wrap');
+  if(!wrap)return;
+  const iframe=wrap.querySelector('iframe');
+  if(!iframe)return;
+  const containerW=wrap.parentElement.clientWidth;
+  const iframeW=850;
+  const scale=Math.min(1,containerW/iframeW);
+  iframe.style.transform='scale('+scale+')';
+  iframe.style.transformOrigin='top center';
+  wrap.style.height=Math.round(700*scale)+'px';
+}
+window.addEventListener('resize',scaleDashIframe);
+
+const NAV_SECTIONS=['home','about','dashboard','awareness-chart','developer'];
+window.addEventListener('scroll',()=>{
+  if(document.getElementById('main-content').style.display==='none')return;
+  let current='home';
+  NAV_SECTIONS.forEach(id=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<=120)current=id;});
+  setActiveNav(current);
+},{passive:true});
+
+function rQ(px,wrap,ans,cur){
+  const selected=ans[cur];
+  const optsHtml=LIKERT_LABELS.map(l=>{
+    const isSel=selected===l.num;
+    return '<button class="likert-opt'+(isSel?' sel':'')+'" data-val="'+l.num+'" onclick="pick(\''+px+'\','+cur+','+l.num+')">'
+      +'<div class="likert-num">'+l.num+'</div>'
+      +'<div class="likert-word">'+l.word.replace('\n','<br>')+'</div>'
+      +'</button>';
+  }).join('');
+  wrap.innerHTML='<div class="q-panel">'
+    +'<div class="q-num">Statement '+(cur+1)+' of '+Q.length+'</div>'
+    +'<div class="q-text">'+Q[cur]+'</div>'
+    +'<div class="scale-legend"><span>1 = Strongly Disagree</span><span>————</span><span>4 = Strongly Agree</span></div>'
+    +'<div class="likert-options">'+optsHtml+'</div>'
+    +'<div class="q-error" id="'+px+'-err">Please select an answer before continuing.</div>'
+    +'</div>';
+}
+
+function pick(px,qi,rating){
+  if(px==='pre')preA[qi]=rating;else postA[qi]=rating;
+  const errEl=document.getElementById(px+'-err');
+  if(errEl)errEl.classList.remove('show');
+  document.getElementById(px+'-qw').querySelectorAll('.likert-opt').forEach(btn=>{
+    btn.classList.toggle('sel',parseInt(btn.dataset.val)===rating);
+  });
+}
+
+function upPre(){
+  rQ('pre',document.getElementById('pre-qw'),preA,preCur);
+  document.getElementById('pre-pg').style.width=((preCur+1)/Q.length*100)+'%';
+  document.getElementById('pre-st').textContent='Statement '+(preCur+1)+' of '+Q.length;
+  document.getElementById('pre-bk').style.display=preCur===0?'none':'';
+  const nx=document.getElementById('pre-nx');
+  nx.textContent=preCur===Q.length-1?'Submit ✓':'Next →';
+  nx.className=preCur===Q.length-1?'btn-nx sub':'btn-nx';
+}
+function preNav(d){
+  if(d===1){
+    if(preA[preCur]===null){document.getElementById('pre-err').classList.add('show');return;}
+    if(preCur===Q.length-1){subPre();return;}
+  }
+  preCur=Math.max(0,Math.min(Q.length-1,preCur+d));upPre();
+}
+function startPreTest(){
+  preA=new Array(Q.length).fill(null);preCur=0;sessionId=Date.now();
+  ['pre-hdr','pre-body','pre-ft'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+  document.querySelector('#page-pretest .t-prog').style.display='';
+  document.getElementById('pre-res').classList.remove('show');
+  upPre();
+}
+
+function upPost(){
+  rQ('post',document.getElementById('post-qw'),postA,postCur);
+  document.getElementById('post-pg').style.width=((postCur+1)/Q.length*100)+'%';
+  document.getElementById('post-st').textContent='Statement '+(postCur+1)+' of '+Q.length;
+  document.getElementById('post-bk').style.display=postCur===0?'none':'';
+  const nx=document.getElementById('post-nx');
+  nx.textContent=postCur===Q.length-1?'Submit ✓':'Next →';
+  nx.className=postCur===Q.length-1?'btn-nx sub':'btn-nx';
+}
+function postNav(d){
+  if(d===1){
+    if(postA[postCur]===null){document.getElementById('post-err').classList.add('show');return;}
+    if(postCur===Q.length-1){subPost();return;}
+  }
+  postCur=Math.max(0,Math.min(Q.length-1,postCur+d));upPost();
+}
+function startPostTest(){
+  postA=new Array(Q.length).fill(null);postCur=0;
+  ['post-hdr','post-body','post-ft'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+  document.querySelector('#page-posttest .t-prog').style.display='';
+  document.getElementById('post-res').classList.remove('show');
+  upPost();
+}
+
+function calcAvg(arr){return arr.filter(v=>v!==null).reduce((s,v)=>s+v,0)/Q.length;}
+function hide(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});}
+
+function getStatus(pct){
+  if(pct>30)return{icon:'🎉',label:'Excellent Improvement',sub:'> 30% increase',color:'var(--sage-light)',border:'var(--sage-mid)'};
+  if(pct>=20)return{icon:'📈',label:'Strong Improvement',sub:'20–30% increase',color:'var(--sky-light)',border:'rgba(127,167,201,0.4)'};
+  if(pct>=10)return{icon:'📊',label:'Moderate Improvement',sub:'10–20% increase',color:'var(--gold-light)',border:'rgba(244,197,66,0.4)'};
+  if(pct>=1)return{icon:'🌱',label:'Slight Improvement',sub:'1–9% increase',color:'var(--peach-light)',border:'rgba(242,210,122,0.4)'};
+  return{icon:'💪',label:'No Change',sub:'Score unchanged',color:'var(--rose-light)',border:'rgba(242,167,160,0.5)'};
+}
+function getConclusionMsg(pct){
+  if(pct>30)return'<strong>Excellent!</strong> Your understanding of global happiness trends has improved significantly after exploring the dashboard.';
+  if(pct>=20)return'<strong>Great progress!</strong> The dashboard has meaningfully increased your awareness of happiness factors and global trends.';
+  if(pct>=10)return'<strong>Good progress!</strong> Your awareness has improved after using the dashboard.';
+  if(pct>=1)return'Your awareness has improved slightly. Continue exploring the dashboard for deeper insights.';
+  return'Your awareness score remained similar. You may revisit the dashboard to explore additional insights.';
+}
+
+function subPre(){
+  preAvg=calcAvg(preA);
+  document.getElementById('pre-score-num').textContent=preAvg.toFixed(2);
+  hide(['pre-hdr','pre-body','pre-ft']);
+  document.querySelector('#page-pretest .t-prog').style.display='none';
+  document.getElementById('pre-res').classList.add('show');
+  setJourneyState('dashboard');
+  sendToSheets({session_id:sessionId,type:'pre',pre_average:parseFloat(preAvg.toFixed(3)),post_average:'',improvement_pct:'',status:'',total_questions:Q.length,answers:preA.join(','),timestamp:new Date().toISOString()});
+}
+
+function subPost(){
+  const postAvg=calcAvg(postA);
+  let pct=((postAvg-preAvg)/4)*100;
+  if(pct<0)pct=0;
+  const status=getStatus(pct);
+  document.getElementById('pre-sd').textContent=preAvg.toFixed(2);
+  document.getElementById('post-sd').textContent=postAvg.toFixed(2);
+  document.getElementById('res-imp-pct').textContent=(pct>0?'+':'')+pct.toFixed(1)+'%';
+  const sc=document.querySelector('.kpi-r.highlight');
+  sc.style.background=status.color;sc.style.borderColor=status.border;
+  document.getElementById('res-status-icon').textContent=status.icon;
+  document.getElementById('res-status-label').textContent=status.label;
+  document.getElementById('res-status-sub').textContent=status.sub;
+  document.getElementById('res-conclusion').innerHTML=getConclusionMsg(pct);
+  document.getElementById('res-desc').textContent='Your awareness score changed from '+preAvg.toFixed(2)+' to '+postAvg.toFixed(2)+' out of 4.00.';
+  hide(['post-hdr','post-body','post-ft']);
+  document.querySelector('#page-posttest .t-prog').style.display='none';
+  document.getElementById('post-res').classList.add('show');
+  setJourneyState('done');
+  sendToSheets({session_id:sessionId,type:'post',pre_average:parseFloat(preAvg.toFixed(3)),post_average:parseFloat(postAvg.toFixed(3)),improvement_pct:parseFloat(pct.toFixed(2)),status:status.label,total_questions:Q.length,answers:postA.join(','),timestamp:new Date().toISOString()});
+  setTimeout(loadChartData,2500);
+}
+
+function sendToSheets(data){
+  if(!SHEET_URL||SHEET_URL==="YOUR_GOOGLE_APPS_SCRIPT_URL_HERE")return;
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(()=>{});
+}
+
+async function loadChartData(){
+  const icon=document.getElementById('refresh-icon');
+  const btn=document.getElementById('refresh-btn');
+  icon.classList.add('spin');btn.disabled=true;
+  try{
+    const res=await fetch(SHEET_URL+'?action=getStats',{mode:'cors'});
+    if(!res.ok)throw new Error();
+    const data=await res.json();
+    renderChart(data);
+  }catch(e){renderChart(null);}
+  finally{icon.classList.remove('spin');btn.disabled=false;}
+}
+
+function renderChart(data){
+  const area=document.getElementById('chart-area');
+  const statsEl=document.getElementById('chart-stats');
+  const hasData=data&&data.respondents>0;
+  const preVal=hasData?parseFloat(data.avg_pre):0;
+  const postVal=hasData?parseFloat(data.avg_post):0;
+  const maxVal=4,W=260,H=200,barW=70,gap=60;
+  const preH=hasData?Math.round((preVal/maxVal)*H):0;
+  const postH=hasData?Math.round((postVal/maxVal)*H):0;
+  const preX=20,postX=20+barW+gap;
+  let grid='';
+  [1,2,3,4].forEach(v=>{
+    const y=H-Math.round((v/maxVal)*H);
+    grid+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="#D9D0C0" stroke-width="1" stroke-dasharray="4,4"/>'
+      +'<text x="-10" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="#8C7E6A" font-family="DM Sans,sans-serif">'+v+'</text>';
+  });
+  const defs='<defs>'
+    +'<linearGradient id="gradPre" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4DBFA8"/><stop offset="100%" stop-color="#80D4C0"/></linearGradient>'
+    +'<linearGradient id="gradPost" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F2607A"/><stop offset="100%" stop-color="#F89AAA"/></linearGradient>'
+    +'<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.10)"/></filter>'
+    +'</defs>';
+  const noDataText=!hasData
+    ?'<text x="'+(W/2)+'" y="'+(H/2-6)+'" text-anchor="middle" font-size="12" fill="#8C7E6A" font-family="DM Sans,sans-serif">No responses yet</text>'
+     +'<text x="'+(W/2)+'" y="'+(H/2+14)+'" text-anchor="middle" font-size="10" fill="#B0A898" font-family="DM Sans,sans-serif">Updates after submissions</text>'
+    :'';
+  const svg='<svg viewBox="0 0 '+(W+80)+' '+(H+80)+'" width="100%" style="overflow:visible;display:block;margin:0 auto;max-width:420px">'
+    +defs
+    +'<g transform="translate(46,38)">'
+    +grid
+    +'<rect x="'+preX+'" y="'+(H-preH)+'" width="'+barW+'" height="'+preH+'" rx="8" fill="'+(hasData?'url(#gradPre)':'#D9D4CA')+'" filter="url(#shadow)" opacity="'+(hasData?1:0.5)+'"/>'
+    +(hasData&&preVal>0?'<text x="'+(preX+barW/2)+'" y="'+(H-preH-10)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#2E9E88" font-family="DM Sans,sans-serif">'+preVal.toFixed(2)+'</text>':'')
+    +'<text x="'+(preX+barW/2)+'" y="'+(H+18)+'" text-anchor="middle" font-size="12" fill="#4A3F30" font-family="DM Sans,sans-serif" font-weight="600">Pre-Test</text>'
+    +'<rect x="'+postX+'" y="'+(H-postH)+'" width="'+barW+'" height="'+postH+'" rx="8" fill="'+(hasData?'url(#gradPost)':'#C8C4BC')+'" filter="url(#shadow)" opacity="'+(hasData?1:0.5)+'"/>'
+    +(hasData&&postVal>0?'<text x="'+(postX+barW/2)+'" y="'+(H-postH-10)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#D42255" font-family="DM Sans,sans-serif">'+postVal.toFixed(2)+'</text>':'')
+    +'<text x="'+(postX+barW/2)+'" y="'+(H+18)+'" text-anchor="middle" font-size="12" fill="#4A3F30" font-family="DM Sans,sans-serif" font-weight="600">Post-Test</text>'
+    +'<line x1="0" y1="'+H+'" x2="'+W+'" y2="'+H+'" stroke="#B0A898" stroke-width="2"/>'
+    +noDataText
+    +'</g></svg>';
+  area.innerHTML=svg;
+  if(hasData){
+    statsEl.style.display='flex';
+    document.getElementById('stat-respondents').textContent=data.respondents;
+    document.getElementById('stat-pre-avg').textContent=preVal.toFixed(2);
+    document.getElementById('stat-post-avg').textContent=postVal.toFixed(2);
+  }else{statsEl.style.display='none';}
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  sessionStorage.removeItem('haplictics_journey');
+  setActiveNav('home');
+  updateJourneyBar();
+  startPreTest();
+  loadChartData();
+  scaleDashIframe(); // run on load, not just resize
+});
+</script>
+</body>
+</html>
